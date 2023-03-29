@@ -19,11 +19,24 @@ app.get("/*", (_, res) => {
   res.redirect("/");
 });
 
-function handleConnect(socket) {
-  console.log(socket);
-}
+//fake data base
+const sockets = [];
 
-wss.on("connection", handleConnect);
+wss.on("connection", (socket) => {
+  // 서버에 연결하면 그 connection을 socktes의 array에 담음
+  sockets.push(socket);
+  //백엔드에서 프론트로 메세지를 보냄
+  console.log("connect browser📍");
+  socket.on("close", () => {
+    console.log("disconnected by browser🚨");
+  });
+  //프론트에서 받음
+  socket.on("message", (message) => {
+    //각 브라우저를 eachSocket으로 표시하고 메세지를 보냄
+    sockets.forEach((eachSocket) => eachSocket.send(message.toString()));
+    console.log(message);
+  });
+});
 
 const handleListen = () =>
   console.log(`✅ Listening on http://localhost:${port} ✅`);

@@ -11,4 +11,11 @@ html(lang="ko")
             h1 Zoom
         main
             h2 Welcome to ZOOM
+            form#nickName
+                input(type="text" placeholder="Choose Nickname" required)
+                button Save
+            ul
+            form#message
+                input(type="text" placeholder="Write Message" required)
+                button Send Message
         script(src="/public/js/app.js")
