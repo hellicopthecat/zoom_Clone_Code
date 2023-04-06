@@ -1,4 +1,18 @@
-const messageList = document.querySelector("ul");
+const socket = io();
+
+const welcome = document.getElementById("welcome");
+const form = welcome.querySelector("form");
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const input = form.querySelector("input");
+  socket.emit("enter_room", {payLoad: input.value}, () => {
+    console.log("hello");
+  });
+  input.value = "";
+}
+form.addEventListener("submit", handleSubmit);
+/* const messageList = document.querySelector("ul");
 const nickNameForm = document.querySelector("#nickName");
 const messageForm = document.querySelector("#message");
 
@@ -49,3 +63,4 @@ function handleNickSubmit(event) {
 
 messageForm.addEventListener("submit", handleSubmit);
 nickNameForm.addEventListener("submit", handleNickSubmit);
+ */

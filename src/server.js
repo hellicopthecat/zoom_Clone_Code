@@ -1,12 +1,14 @@
 import express from "express";
 import http from "http";
-import WebSocket from "ws";
+// import WebSocket from "ws";
+import SocketIO from "socket.io";
 
 const app = express();
 const port = 8000;
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
+const httpServer = http.createServer(app);
+// const wss = new WebSocket.Server({server});
+const wsIoServer = SocketIO(httpServer);
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
@@ -19,7 +21,16 @@ app.get("/*", (_, res) => {
   res.redirect("/");
 });
 
-//fake data base
+wsIoServer.on("connection", (socket) => {
+  socket.on("enter_room", (msg, hello) => {
+    console.log(msg);
+    setTimeout(() => {
+      hello();
+    }, 1000);
+  });
+});
+
+/* //fake data base
 const sockets = [];
 
 wss.on("connection", (socket) => {
@@ -45,8 +56,8 @@ wss.on("connection", (socket) => {
         socket["nickname"] = parsed.payload;
     }
   });
-});
+}); */
 
 const handleListen = () =>
   console.log(`✅ Listening on http://localhost:${port} ✅`);
-server.listen(port, handleListen);
+httpServer.listen(port, handleListen);
