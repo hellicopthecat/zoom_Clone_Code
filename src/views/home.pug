@@ -7,13 +7,18 @@ html(lang="ko")
         link(rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css")
         title Zoom
     body 
-        header 
-            h1 Zoom
+        header
+            h1 Noom
         main
-            h2 Welcome to ZOOM
-            div#welcome 
-                form
-                    input(type="text" placeholder="Room Name" required)
-                    button Enter Room
+            div#welcome
+                form(action="")
+                    input(type="text" placeholder="room name" required)
+                    button enter
+            div#room
+                h3
+                ul
+                form(action="")
+                    input(type="text" placeholder="Message" required)
+                    button send
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")

@@ -8,7 +8,7 @@ const port = 8000;
 
 const httpServer = http.createServer(app);
 // const wss = new WebSocket.Server({server});
-const wsIoServer = SocketIO(httpServer);
+const wsServer = SocketIO(httpServer);
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
@@ -20,43 +20,6 @@ app.get("/", (_, res) => {
 app.get("/*", (_, res) => {
   res.redirect("/");
 });
-
-wsIoServer.on("connection", (socket) => {
-  socket.on("enter_room", (msg, hello) => {
-    console.log(msg);
-    setTimeout(() => {
-      hello();
-    }, 1000);
-  });
-});
-
-/* //fake data base
-const sockets = [];
-
-wss.on("connection", (socket) => {
-  // 서버에 연결하면 그 connection을 socktes의 array에 담음
-  sockets.push(socket);
-  // 닉네임이 없는 사람들을 고려해
-  socket["nickname"] = "Anonymous";
-  //백엔드에서 프론트로 메세지를 보냄
-  console.log("connect browser📍");
-  socket.on("close", () => {
-    console.log("disconnected by browser🚨");
-  });
-  //프론트에서 받음
-  socket.on("message", (message) => {
-    //각 브라우저를 eachSocket으로 표시하고 메세지를 보냄
-    const parsed = JSON.parse(message);
-    switch (parsed.type) {
-      case "new_message":
-        sockets.forEach((eachSocket) =>
-          eachSocket.send(`${socket.nickname} : ${parsed.payload}`)
-        );
-      case "nickname":
-        socket["nickname"] = parsed.payload;
-    }
-  });
-}); */
 
 const handleListen = () =>
   console.log(`✅ Listening on http://localhost:${port} ✅`);
