@@ -8,7 +8,7 @@ const port = 8000;
 
 const httpServer = http.createServer(app);
 // const wss = new WebSocket.Server({server});
-const wsServer = SocketIO(httpServer);
+const wss = SocketIO(httpServer);
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
@@ -24,3 +24,17 @@ app.get("/*", (_, res) => {
 const handleListen = () =>
   console.log(`✅ Listening on http://localhost:${port} ✅`);
 httpServer.listen(port, handleListen);
+
+wss.on("connection", (socket) => {
+  // 소켓의 관련된 모든 이벤트를 감시
+  socket.onAny((event) => {
+    console.log(`socket event : ${event}`);
+  });
+  // 방만들기 소켓을 프론트와 연동한다. 인자로는 방제목과 실행함수(꼭 아니여도 됨)를 프론트에서 받을 수 있게 한다.[1]
+  socket.on("room_create", (roomname, done) => {
+    //[1-2] 프론트의 받은 값으로 방에 들어가게 한다.
+    //[1-3] 방이 생성되면 각 방마다 ID가 자동생성된다 (console.log(socket.id))
+    socket.join(roomname);
+    done();
+  });
+});
