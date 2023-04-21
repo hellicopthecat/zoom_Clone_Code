@@ -46,4 +46,9 @@ wss.on("connection", (socket) => {
       socket.to(room).emit("bye");
     });
   });
+  //[2-3] handleMsgSubit에서 받은 4개의 인자를 백엔드에 받아 프론트로 다시 넘겨줄 준비
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", msg);
+    done();
+  });
 });
