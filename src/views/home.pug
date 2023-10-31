@@ -1,24 +1,22 @@
-doctype html
 html(lang="ko")
     head
         meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        link(rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css")
-        title Zoom
+        title WebSocet & webrtc
+        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
     body 
-        header
-            h1 Noom
+        header 
+            h1 ZOOM CLONE
         main
-            div#room
-                form(action="")
-                    input(type="text" placeholder="room name" required)
-                    button enter
-            div#message
-                h3
+            h3 Welcom to Zoom Clone
+            div 
+                form#nickName
+                    input(text="text" placeholder="Write a nickname" required)
+                    button(type="submit") Choose
+            div 
                 ul
-                form(action="")
-                    input(type="text" placeholder="Message" required)
-                    button send
-        script(src="/socket.io/socket.io.js")
-        script(src="/public/js/app.js")
+                form#msgSend
+                    input(type="text" placeholder="Write a message" required)
+                    button(type="submit") send Msg
+            
+        script(src="public/js/frontend.js") 
