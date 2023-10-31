@@ -9,14 +9,23 @@ html(lang="ko")
             h1 ZOOM CLONE
         main
             h3 Welcom to Zoom Clone
-            div 
+            div#room
+                form
+                    legend 
+                        h4 Input Room Name
+                    input(text="text" placeholder="Write a Room Name" required)
+                    button(type="submit") JOIN Enter Room
+            div#chat(hidden)
                 form#nickName
-                    input(text="text" placeholder="Write a nickname" required)
-                    button(type="submit") Choose
-            div 
+                    legend 
+                        h4 NICK NAME
+                    input(type="text" placeholder="Write a Nick Name" required)
+                    button(type="submit") Done
                 ul
                 form#msgSend
+                    legend 
+                        h4
                     input(type="text" placeholder="Write a message" required)
                     button(type="submit") send Msg
-            
+        script(src="/socket.io/socket.io.js")
         script(src="public/js/frontend.js") 

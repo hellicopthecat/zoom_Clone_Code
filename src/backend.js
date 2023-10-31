@@ -1,6 +1,6 @@
 import http from "http";
 import expess from "express";
-import io from "socket.io";
+import socketIo from "socket.io";
 
 const app = expess();
 app.set("view engine", "pug");
@@ -12,29 +12,29 @@ app.get("/*", (req, res) => res.redirect("/"));
 const handleListen = () =>
   console.log("Server is Listening http://localhost:4300");
 const server = http.createServer(app);
+const wsServer = socketIo(server);
 
-/* const sockets = [];
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "ANON";
-  console.log("open backend");
-  socket.send(`${socket.nickname} is join`);
-  socket.on("message", (msg) => {
-    const {type, value} = JSON.parse(msg);
+wsServer.on("connection", (socket) => {
+  socket["nickname"] = "ANONYMOUS";
+  socket.on("createRoom", (roomname, enterRoom) => {
+    socket.join(roomname);
+    enterRoom();
+    socket.to(roomname).emit("Welcome", socket.nickname);
+  });
 
-    switch (type) {
-      case "msg":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname} : ${value}`)
-        );
-      case "nick":
-        socket["nickname"] = value;
-    }
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
   });
-  socket.on("close", () => {
-    console.log("front is disconneted");
+
+  socket.on("new_msg", (msg, room, done) => {
+    socket.to(room).emit("new_msg", `${socket.nickname} : ${msg}`);
+    done();
   });
-}); */
+  socket.on("nickname", (nick) => (socket["nickname"] = nick));
+});
+
 server.listen(4300, handleListen);
 
 // app.listen(4300, handleListen);
