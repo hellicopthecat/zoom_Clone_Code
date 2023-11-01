@@ -4,7 +4,7 @@ const room = document.getElementById("room");
 const roomForm = room.querySelector("form");
 const chat = document.getElementById("chat");
 const msgSendForm = document.getElementById("msgSend");
-const nickForm = document.getElementById("nickName");
+const roomList = document.getElementById("roomList");
 
 chat.hidden = true;
 let roomName;
@@ -25,11 +25,6 @@ function handleMsgSubmit(e) {
   });
   input.value = "";
 }
-function handleNickSubmit(e) {
-  e.preventDefault();
-  const input = nickForm.querySelector("input");
-  socket.emit("nickname", input.value);
-}
 
 function showRoom() {
   room.hidden = true;
@@ -37,24 +32,41 @@ function showRoom() {
   const h4 = msgSendForm.querySelector("h4");
   h4.innerText = `Welcome to ${roomName}`;
   msgSendForm.addEventListener("submit", handleMsgSubmit);
-  nickForm.addEventListener("submit", handleNickSubmit);
 }
 
 function handleRoomSubmit(e) {
   e.preventDefault();
-  const input = roomForm.querySelector("input");
-  socket.emit("createRoom", input.value, showRoom);
-  roomName = input.value;
-  input.value = "";
+  const nickInput = roomForm.querySelector("#nick");
+  const roomInput = roomForm.querySelector("#room");
+  socket.emit("createRoom", roomInput.value, showRoom);
+  socket.emit("nickname", nickInput.value);
+  roomName = roomInput.value;
 }
+
 roomForm.addEventListener("submit", handleRoomSubmit);
 
-socket.on("Welcome", (user) => {
+socket.on("Welcome", (user, newCount) => {
+  const h4 = msgSendForm.querySelector("h4");
+  h4.innerText = `Welcome to ${roomName} (${newCount})`;
   addMsg(`${user} JOIN This Room`);
 });
-socket.on("bye", (left) => {
+socket.on("bye", (left, newCount) => {
+  const h4 = msgSendForm.querySelector("h4");
+  h4.innerText = `Welcome to ${roomName} (${newCount})`;
   addMsg(`${left} Left This Room`);
 });
 socket.on("new_msg", (msg) => {
   addMsg(msg);
+});
+socket.on("room_change", (rooms) => {
+  const ul = roomList.querySelector("ul");
+  ul.innerHTML = "";
+  if (rooms.length === 0) {
+    return;
+  }
+  rooms.forEach((room) => {
+    const li = document.createElement("li");
+    li.innerText = room;
+    ul.appendChild(li);
+  });
 });

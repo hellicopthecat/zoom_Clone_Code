@@ -12,20 +12,22 @@ html(lang="ko")
             div#room
                 form
                     legend 
-                        h4 Input Room Name
-                    input(text="text" placeholder="Write a Room Name" required)
-                    button(type="submit") JOIN Enter Room
-            div#chat(hidden)
-                form#nickName
-                    legend 
                         h4 NICK NAME
-                    input(type="text" placeholder="Write a Nick Name" required)
-                    button(type="submit") Done
+                    input(id="nick" type="text" placeholder="Write a Nick Name" required)
+                    legend 
+                        h4 Input Room Name
+                    input(id="room" text="text" placeholder="Write a Room Name" required)
+                    button(type="submit") JOIN Enter Room
+                
+            div#chat(hidden)
                 ul
                 form#msgSend
                     legend 
                         h4
                     input(type="text" placeholder="Write a message" required)
                     button(type="submit") send Msg
+            div#roomList
+                h4 OPEN ROOMS
+                ul
         script(src="/socket.io/socket.io.js")
         script(src="public/js/frontend.js") 
