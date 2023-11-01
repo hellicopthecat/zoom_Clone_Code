@@ -9,7 +9,18 @@ html(lang="ko")
             h1 ZOOM CLONE
         main
             h3 Welcom to Zoom Clone
-            div#room
+            div#welcome
+                form(action="") 
+                    input(type="text", name="" placeholder="Room Name" required)
+                    button Enter Room
+            div#call(hidden)
+                div#myStream
+                    video#myFace(autoplay, playsinLine, width='400', height='400')
+                    button#mute MUTE
+                    button#camera CAM OFF
+                    select#cameras(name='')
+                        option(value="device") 선택
+            div#room(hidden)
                 form
                     legend 
                         h4 NICK NAME

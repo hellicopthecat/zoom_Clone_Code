@@ -23,6 +23,7 @@ instrument(wsServer, {
   auth: false,
   mode: "development",
 });
+
 function publicRooms() {
   const {
     sockets: {
@@ -42,7 +43,7 @@ function countRoom(roomName) {
 }
 wsServer.on("connection", (socket) => {
   socket["nickname"] = "ANONYMOUS";
-
+  // chat
   socket.on("createRoom", (roomname, enterRoom) => {
     socket.join(roomname);
     enterRoom();
@@ -64,8 +65,15 @@ wsServer.on("connection", (socket) => {
     done();
   });
   socket.on("nickname", (nick) => (socket["nickname"] = nick));
+  //webRTC
+  socket.on("join_room", (roomname, show) => {
+    socket.join(roomname);
+    show();
+    socket.to(roomname).emit("join_cam");
+  });
+  socket.on("offer", (offer, roomname) => {
+    socket.to(roomname).emit("offer", offer);
+  });
 });
 
 httpServer.listen(3000, handleListen);
-
-// app.listen(4300, handleListen);
