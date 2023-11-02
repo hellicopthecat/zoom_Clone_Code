@@ -10,7 +10,9 @@ html(lang="ko")
         main
             h3 Welcom to Zoom Clone
             div#welcome
-                form(action="") 
+                form(action="")
+                    legend
+                        h4 CAM CHAT
                     input(type="text", name="" placeholder="Room Name" required)
                     button Enter Room
             div#call(hidden)
@@ -20,6 +22,8 @@ html(lang="ko")
                     button#camera CAM OFF
                     select#cameras(name='')
                         option(value="device") 선택
+                div
+                    video#peerStream(autoplay, playsinLine, width='400', height='400')
             div#room(hidden)
                 form
                     legend 

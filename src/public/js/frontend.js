@@ -80,6 +80,7 @@ let myStream;
 let muted = false;
 let camOff = false;
 let myPeerConnection;
+let myDataChannel;
 
 async function getCameras() {
   try {
@@ -152,6 +153,13 @@ function handleCameraBtn(e) {
 
 async function handleCamChange() {
   await getMedia(cameras.value);
+  if (myPeerConnection) {
+    const videoTrack = myStream.getVideoTracks()[1];
+    const videoSender = myPeerConnection
+      .getSenders()
+      .find((sender) => sender.track.kind === "video");
+    videoSender.replaceTrack(videoTrack);
+  }
 }
 muteBtn.addEventListener("click", handleMuteBtn);
 cameraBtn.addEventListener("click", handleCameraBtn);
@@ -170,10 +178,11 @@ async function callShow() {
   makeConnection();
 }
 
-function handleWelcomeSubmit(e) {
+async function handleWelcomeSubmit(e) {
   e.preventDefault();
   const input = welcomeForm.querySelector("input");
-  socket.emit("join_room", input.value, callShow);
+  await callShow();
+  socket.emit("join_room", input.value);
   roomName = input.value;
   input.value = "";
 }
@@ -181,17 +190,65 @@ function handleWelcomeSubmit(e) {
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 socket.on("join_cam", async () => {
+  myDataChannel = myPeerConnection.createDataChannel("chat");
+  myDataChannel.addEventListener("message", (event) => {
+    console.log(event.data);
+  });
   const offer = await myPeerConnection.createOffer();
-  console.log("offer is here");
-  socket.on("offer", offer, roomName);
+  myPeerConnection.setLocalDescription(offer);
+  socket.emit("offer", offer, roomName);
 });
-socket.on("offer", (offer) => {
-  console.log(offer);
+socket.on("offer", async (offer) => {
+  myPeerConnection.addEventListener("datachannel", (event) => {
+    myDataChannel = event.channel;
+    myDataChannel.addEventListener("message", (event) => {
+      console.log(event.data);
+    });
+  });
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer();
+  myPeerConnection.setLocalDescription(answer);
+  socket.emit("answer", answer, roomName);
+});
+socket.on("answer", (answer) => {
+  myPeerConnection.setRemoteDescription(answer);
+});
+socket.on("ice", (ice) => {
+  myPeerConnection.addIceCandidate(ice);
 });
 //RTC code
 function makeConnection() {
-  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          //개인 고유의 stun 서버가 필요하다
+          //아래는 테스트용으로만 사용
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ],
+      },
+    ],
+  });
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  myPeerConnection.addEventListener("addstream", handleAddStream);
   myStream.getTracks().forEach((track) => {
     myPeerConnection.addTrack(track, myStream);
   });
 }
+
+function handleIce(data) {
+  socket.emit("ice", data.candidate, roomName);
+}
+function handleAddStream(data) {
+  const peersStream = document.getElementById("peerStream");
+  peersStream.srcObject = data.stream;
+}
+
+//webRTC를 쓰면 안좋은 곳
+//peer가 많은 곳 많아지면 느려지기 시작함.
+//sfu 서버를 사용함 - 다른사람에게 저사양 화면을 제공
+//data channel - 이미지 파일 텍스트을 주고 받을 수 있다.

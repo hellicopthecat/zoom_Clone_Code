@@ -66,13 +66,18 @@ wsServer.on("connection", (socket) => {
   });
   socket.on("nickname", (nick) => (socket["nickname"] = nick));
   //webRTC
-  socket.on("join_room", (roomname, show) => {
+  socket.on("join_room", (roomname) => {
     socket.join(roomname);
-    show();
     socket.to(roomname).emit("join_cam");
   });
   socket.on("offer", (offer, roomname) => {
     socket.to(roomname).emit("offer", offer);
+  });
+  socket.on("answer", (answer, roomname) => {
+    socket.to(roomname).emit("answer", answer);
+  });
+  socket.on("ice", (ice, roomname) => {
+    socket.to(roomname).emit("ice", ice);
   });
 });
 
